@@ -1,0 +1,171 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  accounts      Account[]
+  sessions      Session[]
+
+  createdAt     DateTime       @default(now())
+  updatedAt     DateTime       @updatedAt
+  role          Role           @default(STUDENT)
+  riskProfile   RiskProfile?
+  enrollments   Enrollment[]
+  aiinsights    AIInsight[]
+  grades        Grade[]
+  announcements Announcement[]
+  attendance    Attendance[]
+}
+
+enum Role {
+  STUDENT
+  TEACHER
+  ADMIN
+}
+
+model Account {
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+}
+
+model Session {
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model RiskProfile {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  dropoutRisk    Float // Percentage
+  overloadRisk   Float // Percentage
+  wellbeingScore Int
+  attendanceRate Float // Percentage
+
+  updatedAt DateTime @updatedAt
+}
+
+model Course {
+  id          String  @id @default(cuid())
+  code        String  @unique // e.g., "CS-101"
+  name        String // e.g., "Calculus II"
+  description String?
+  credits     Int     @default(3)
+
+  enrollments Enrollment[]
+  deadlines   Deadline[]
+  grades      Grade[]
+  attendance  Attendance[]
+}
+
+model Enrollment {
+  id       String @id @default(cuid())
+  userId   String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId String
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  currentLoad  String // "High", "Optimal", "Light" -> could be enum
+  hoursPerWeek Int
+
+  createdAt DateTime @default(now())
+
+  @@unique([userId, courseId])
+}
+
+model Deadline {
+  id       String   @id @default(cuid())
+  courseId String
+  course   Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title    String // e.g., "Weekly Problem Set 5"
+  dueDate  DateTime
+  priority String // "High", "Medium", "Low"
+  status   String // "In Progress", "Not Started", "Completed"
+
+  createdAt DateTime @default(now())
+}
+
+model AIInsight {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  content     String
+  title       String
+  isDismissed Boolean  @default(false)
+  createdAt   DateTime @default(now())
+}
+
+model Grade {
+  id       String @id @default(cuid())
+  userId   String
+  user     User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId String
+  course   Course @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  grade    Float // e.g., 4.0 scale
+  semester String // e.g., "Fall 2025" or "Sem 1"
+
+  createdAt DateTime @default(now())
+}
+
+model Announcement {
+  id        String   @id @default(cuid())
+  title     String
+  content   String
+  createdAt DateTime @default(now())
+  expiresAt DateTime?
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Attendance {
+  id        String   @id @default(cuid())
+  date      DateTime
+  status    String   // "PRESENT", "ABSENT", "LATE", "EXCUSED"
+
+  studentId String
+  student   User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+
+  courseId  String
+  course    Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([studentId, courseId, date])
+}
