@@ -35,4 +35,4 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
 
-Predstavitev https://scvsi-my.sharepoint.com/:p:/g/personal/mehmed_omerovic_scv_si1/IQA9hye22sH0QZUVgx3sX1dfAcpEYoKTybQvwcbEDz5T37o?e=JRCRjh
+Predstavitev [https://scvsi-my.sharepoint.com/:p:/g/personal/mehmed_omerovic_scv_si1/IQA9hye22sH0QZUVgx3sX1dfAcpEYoKTybQvwcbEDz5T37o?e=JRCRjh](https://scvsi-my.sharepoint.com/:p:/g/personal/mehmed_omerovic_scv_si1/IQAK544qMnfKR7GD05BNOBLuAc4rUtjfFmkBmsItuIfm4os?e=VARDRz)
